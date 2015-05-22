@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>0.1.0.0</version>
+    <title>Gorilla Geek DDD Skel</title>
+    <authors>Carlos André Ferrari</authors>
+    <owners>caferrari</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/GorillaGeek/ddd-skel</projectUrl>
+    <iconUrl>https://avatars2.githubusercontent.com/u/10532134</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Basic skel to make DDD based applications</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <tags>ddd</tags>
+  </metadata>
+</package>

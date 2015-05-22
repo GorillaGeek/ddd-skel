@@ -1,6 +1,4 @@
-﻿using Ninject;
-using System.Data.Entity;
-using System.Transactions;
+﻿using System.Transactions;
 
 namespace Gorilla.DDD
 {

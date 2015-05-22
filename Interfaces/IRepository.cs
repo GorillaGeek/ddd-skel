@@ -1,10 +1,10 @@
 ﻿
-using Gorilla.DDD.Pagination;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+
+using Gorilla.DDD.Pagination;
 
 namespace Gorilla.DDD
 {

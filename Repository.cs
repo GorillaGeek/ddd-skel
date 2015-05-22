@@ -1,13 +1,13 @@
-﻿using Ninject;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Ninject;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using Gorilla.DDD.Pagination;
-using System.Data.Entity;
+using System.Collections.Generic;
+
 using Gorilla.DDD.Extensions;
+using Gorilla.DDD.Pagination;
 
 namespace Gorilla.DDD
 {

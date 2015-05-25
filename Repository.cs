@@ -18,9 +18,14 @@ namespace Gorilla.DDD
     {
         protected TContext _context;
 
-        public static event EventHandler<EntityEventArgs> EntityAdded;
-        public static event EventHandler<EntityEventArgs> EntityUpdated;
-        public static event EventHandler<EntityEventArgs> EntityRemoved;
+        public static event EventHandler<EntityEventArgs> OnBeforePersist;
+        public static event EventHandler<EntityEventArgs> OnAfterPersist;
+
+        public static event EventHandler<EntityEventArgs> OnBeforeSave;
+        public static event EventHandler<EntityEventArgs> OnAfterSave;
+
+        public static event EventHandler<EntityEventArgs> OnBeforeRemove;
+        public static event EventHandler<EntityEventArgs> OnAfterRemove;
         
         [Inject]
         public void InjectDependencies(TContext context) 
@@ -40,19 +45,20 @@ namespace Gorilla.DDD
         
         public virtual async Task<TEntity> Add(TEntity entity)
         {
+            this.RaiseBeforePersist(entity);
             _context.Set<TEntity>().Add(entity);
             await _context.SaveChangesAsync();
-            this.RaiseEntityAdded(entity);
+            this.RaiseAfterPersist(entity);
 
             return entity;
         }
 
         public virtual async Task<TEntity> Update(TEntity entity)
         {
-
+            this.RaiseBeforeSave(entity);
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            this.RaiseEntityUpdated(entity);
+            this.RaiseAfterSave(entity);
 
             return entity;
         }
@@ -66,10 +72,12 @@ namespace Gorilla.DDD
                 throw new ArgumentException("Entity not found");
             }
 
+            this.RaiseBeforeRemove(entity);
+
             _context.Set<TEntity>().Remove(entity);
             await _context.SaveChangesAsync();
 
-            this.RaiseEntityRemoved(entity);
+            this.RaiseAfterRemove(entity);
 
             return true;
         }
@@ -163,29 +171,57 @@ namespace Gorilla.DDD
             return query;
         }
 
-        protected virtual void RaiseEntityAdded(Entity entity)
+        #region events
+
+        protected virtual void RaiseBeforePersist(Entity entity)
         {
-            if (EntityAdded != null)
+            if (OnBeforePersist != null)
             {
-                EntityAdded(this, new EntityEventArgs() { Entity = entity });
+                OnBeforePersist(this, new EntityEventArgs() { Entity = entity });
             }
         }
 
-        protected virtual void RaiseEntityUpdated(Entity entity)
+        protected virtual void RaiseAfterPersist(Entity entity)
         {
-            if (EntityUpdated != null)
+            if (OnAfterPersist != null)
             {
-                EntityUpdated(this, new EntityEventArgs() { Entity = entity });
+                OnAfterPersist(this, new EntityEventArgs() { Entity = entity });
             }
         }
 
-        protected virtual void RaiseEntityRemoved(Entity entity)
+        protected virtual void RaiseBeforeSave(Entity entity)
         {
-            if (EntityRemoved != null)
+            if (OnBeforeSave != null)
             {
-                EntityRemoved(this, new EntityEventArgs() { Entity = entity });
+                OnBeforeSave(this, new EntityEventArgs() { Entity = entity });
             }
         }
+
+        protected virtual void RaiseAfterSave(Entity entity)
+        {
+            if (OnAfterSave != null)
+            {
+                OnAfterSave(this, new EntityEventArgs() { Entity = entity });
+            }
+        }
+
+        protected virtual void RaiseBeforeRemove(Entity entity)
+        {
+            if (OnBeforeRemove != null)
+            {
+                OnBeforeRemove(this, new EntityEventArgs() { Entity = entity });
+            }
+        }
+
+        protected virtual void RaiseAfterRemove(Entity entity)
+        {
+            if (OnAfterRemove != null)
+            {
+                OnAfterRemove(this, new EntityEventArgs() { Entity = entity });
+            }
+        }
+
+        #endregion events
 
     }
 }

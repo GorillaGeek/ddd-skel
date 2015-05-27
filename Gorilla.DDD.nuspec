@@ -2,10 +2,10 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>0.2.0.0</version>
+    <version>0.3.0.0</version>
     <title>Gorilla Geek DDD Skel</title>
-    <authors>Carlos André Ferrari</authors>
-    <owners>caferrari</owners>
+    <authors>Carlos André Ferrari,Daniel Prado,Felipe Gouveia Esteves</authors>
+    <owners>caferrari,danieloprado,felipegouveiae</owners>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>https://github.com/GorillaGeek/ddd-skel</projectUrl>
     <iconUrl>https://avatars2.githubusercontent.com/u/10532134</iconUrl>

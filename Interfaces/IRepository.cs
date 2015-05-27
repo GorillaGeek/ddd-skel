@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using Gorilla.DDD.Pagination;
+using System.Linq;
 
 namespace Gorilla.DDD
 {
@@ -34,6 +35,8 @@ namespace Gorilla.DDD
         Task<PagedResult<TEntity>> SelectPagedBy(PaginationSettings settings, Expression<Func<TEntity, bool>> exp);
 
         Task<PagedResult<U>> SelectPaged<U>(PaginationSettings settings, Expression<Func<TEntity, U>> columns);
-                
+        IQueryable<U> Query<U>(Expression<Func<TEntity, U>> columns);
+
+        IQueryable<TResult> QueryBy<TResult>(Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns);
     }
 }

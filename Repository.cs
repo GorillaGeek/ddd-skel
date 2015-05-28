@@ -18,15 +18,6 @@ namespace Gorilla.DDD
     {
         protected TContext _context;
 
-        public static event EventHandler<EntityEventArgs> OnBeforePersist;
-        public static event EventHandler<EntityEventArgs> OnAfterPersist;
-
-        public static event EventHandler<EntityEventArgs> OnBeforeSave;
-        public static event EventHandler<EntityEventArgs> OnAfterSave;
-
-        public static event EventHandler<EntityEventArgs> OnBeforeRemove;
-        public static event EventHandler<EntityEventArgs> OnAfterRemove;
-
         [Inject]
         public void InjectDependencies(TContext context)
         {
@@ -45,20 +36,23 @@ namespace Gorilla.DDD
 
         public virtual async Task<TEntity> Add(TEntity entity)
         {
-            this.RaiseBeforePersist(entity);
             _context.Set<TEntity>().Add(entity);
             await _context.SaveChangesAsync();
-            this.RaiseAfterPersist(entity);
 
             return entity;
         }
 
         public virtual async Task<TEntity> Update(TEntity entity)
         {
-            this.RaiseBeforeSave(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            this.RaiseAfterSave(entity);
+            try
+            {
+                _context.EnableAutoDetectChanges();
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.DisableAutoDetectChanges();
+            }
 
             return entity;
         }
@@ -72,12 +66,14 @@ namespace Gorilla.DDD
                 throw new ArgumentException("Entity not found");
             }
 
-            this.RaiseBeforeRemove(entity);
+            return await this.Remove(entity);
+        }
+
+        public virtual async Task<bool> Remove(TEntity entity)
+        {
 
             _context.Set<TEntity>().Remove(entity);
             await _context.SaveChangesAsync();
-
-            this.RaiseAfterRemove(entity);
 
             return true;
         }
@@ -116,6 +112,13 @@ namespace Gorilla.DDD
 
             return query.Where(exp)
                         .Select<TEntity, TResult>(columns);
+        }
+
+        public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> exp)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+            query = this.AddFixedConditions(query);
+            return query.Where(exp);
         }
 
         public virtual IQueryable<U> Query<U>(Expression<Func<TEntity, U>> columns)
@@ -182,58 +185,5 @@ namespace Gorilla.DDD
         {
             return query;
         }
-
-        #region events
-
-        protected virtual void RaiseBeforePersist(Entity entity)
-        {
-            if (OnBeforePersist != null)
-            {
-                OnBeforePersist(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        protected virtual void RaiseAfterPersist(Entity entity)
-        {
-            if (OnAfterPersist != null)
-            {
-                OnAfterPersist(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        protected virtual void RaiseBeforeSave(Entity entity)
-        {
-            if (OnBeforeSave != null)
-            {
-                OnBeforeSave(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        protected virtual void RaiseAfterSave(Entity entity)
-        {
-            if (OnAfterSave != null)
-            {
-                OnAfterSave(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        protected virtual void RaiseBeforeRemove(Entity entity)
-        {
-            if (OnBeforeRemove != null)
-            {
-                OnBeforeRemove(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        protected virtual void RaiseAfterRemove(Entity entity)
-        {
-            if (OnAfterRemove != null)
-            {
-                OnAfterRemove(this, new EntityEventArgs() { Entity = entity });
-            }
-        }
-
-        #endregion events
-
     }
 }

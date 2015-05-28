@@ -24,6 +24,8 @@ namespace Gorilla.DDD
 
         Task<bool> Remove(TKey id);
 
+        Task<bool> Remove(TEntity entity);
+
         Task<List<U>> SelectBy<U>(Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, U>> columns);
 
         Task<List<TEntity>> SelectBy(Expression<Func<TEntity, bool>> exp);

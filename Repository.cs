@@ -56,8 +56,9 @@ namespace Gorilla.DDD
         public virtual async Task<TEntity> Update(TEntity entity)
         {
             this.RaiseBeforeSave(entity);
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.EnableAutoDetectChanges();
             await _context.SaveChangesAsync();
+            _context.DisableAutoDetectChanges();
             this.RaiseAfterSave(entity);
 
             return entity;
@@ -116,6 +117,13 @@ namespace Gorilla.DDD
 
             return query.Where(exp)
                         .Select<TEntity, TResult>(columns);
+        }
+
+        public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> exp)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+            query = this.AddFixedConditions(query);
+            return query.Where(exp);
         }
 
         public virtual IQueryable<U> Query<U>(Expression<Func<TEntity, U>> columns)

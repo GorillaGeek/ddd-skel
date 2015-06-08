@@ -14,8 +14,9 @@ namespace Gorilla.DDD.Extensions
             ParameterExpression parameter = Expression.Parameter(query.ElementType, "p");
 
             MemberExpression memberAccess = null;
-            memberAccess = MemberExpression.Property
-                   (memberAccess ?? (parameter as Expression), sortColumn);
+            foreach (var property in sortColumn.Split('.'))
+                memberAccess = MemberExpression.Property
+                   (memberAccess ?? (parameter as Expression), property);
 
             LambdaExpression orderByLambda = Expression.Lambda(memberAccess, parameter);
 

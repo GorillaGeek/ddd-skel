@@ -1,18 +1,20 @@
 ﻿
+using Gorilla.DDD.Pagination;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using Gorilla.DDD.Pagination;
-using System.Linq;
 
 namespace Gorilla.DDD
 {
     public interface IRepository<TEntity, TKey>
-        where TEntity: Entity
+        where TEntity : Entity
         where TKey : IComparable
     {
+
+        DbContextTransaction BeginTransaction();
 
         Task<TEntity> Find(TKey id);
 

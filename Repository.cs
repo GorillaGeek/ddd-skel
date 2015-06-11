@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Gorilla.DDD.Extensions;
+using Gorilla.DDD.Pagination;
 using Ninject;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Gorilla.DDD.Extensions;
-using Gorilla.DDD.Pagination;
 
 namespace Gorilla.DDD
 {
@@ -22,6 +21,11 @@ namespace Gorilla.DDD
         public void InjectDependencies(TContext context)
         {
             this._context = context;
+        }
+
+        public DbContextTransaction BeginTransaction()
+        {
+            return _context.Database.BeginTransaction();
         }
 
         public virtual async Task<TEntity> Find(TKey id)

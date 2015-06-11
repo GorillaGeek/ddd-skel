@@ -8,19 +8,18 @@ namespace Gorilla.DDD.Extensions
 
         public static IQueryable<T> OrderBy<T>(this IQueryable<T> query, string sortColumn, string direction)
         {
-            string methodName = string.Format("OrderBy{0}",
+            var methodName = string.Format("OrderBy{0}",
                 direction == "Descending" ? "Descending" : "");
-
-            ParameterExpression parameter = Expression.Parameter(query.ElementType, "p");
+            var parameter = Expression.Parameter(query.ElementType, "p");
 
             MemberExpression memberAccess = null;
             foreach (var property in sortColumn.Split('.'))
-                memberAccess = MemberExpression.Property
-                   (memberAccess ?? (parameter as Expression), property);
+            {
+                memberAccess = Expression.Property(memberAccess ?? ((Expression) parameter), property);
+            }
 
-            LambdaExpression orderByLambda = Expression.Lambda(memberAccess, parameter);
-
-            MethodCallExpression result = Expression.Call(
+            var orderByLambda = Expression.Lambda(memberAccess, parameter);
+            var result = Expression.Call(
                       typeof(Queryable),
                       methodName,
                       new[] { query.ElementType, memberAccess.Type },

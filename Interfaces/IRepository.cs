@@ -9,10 +9,25 @@ using System.Threading.Tasks;
 
 namespace Gorilla.DDD
 {
+    public delegate Task BeforeSaveEventHandler(object sender, EntityEventArgs e);
+    public delegate Task BeforePersistEventHandler(object sender, EntityEventArgs e);
+    public delegate Task BeforeDeleteEventHandler(object sender, EntityEventArgs e);
+
+    public delegate Task AfterSaveEventHandler(object sender, EntityEventArgs e);
+    public delegate Task AfterPersistEventHandler(object sender, EntityEventArgs e);
+    public delegate Task AfterDeleteEventHandler(object sender, EntityEventArgs e);
+
     public interface IRepository<TEntity, TKey>
         where TEntity : Entity
         where TKey : IComparable
     {
+        event BeforeSaveEventHandler BeforeSave;
+        event BeforePersistEventHandler BeforePersist;
+        event BeforeDeleteEventHandler BeforeDelete;
+
+        event AfterSaveEventHandler AfterSave;
+        event AfterPersistEventHandler AfterPersist;
+        event AfterDeleteEventHandler AfterDelete;
 
         DbContextTransaction BeginTransaction();
 
@@ -45,5 +60,6 @@ namespace Gorilla.DDD
         IQueryable<U> Query<U>(Expression<Func<TEntity, U>> columns);
 
         IQueryable<TResult> QueryBy<TResult>(Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns);
+
     }
 }

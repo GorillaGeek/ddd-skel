@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TransactionalService.cs" />
     <Compile Include="Interfaces\IContext.cs" />
     <Compile Include="Extensions\LinkExtensions.cs" />
     <Compile Include="Entity.cs" />

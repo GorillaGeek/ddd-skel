@@ -9,26 +9,11 @@ using System.Threading.Tasks;
 
 namespace Gorilla.DDD
 {
-    public delegate Task BeforeSaveEventHandler(object sender, EntityEventArgs e);
-    public delegate Task BeforePersistEventHandler(object sender, EntityEventArgs e);
-    public delegate Task BeforeDeleteEventHandler(object sender, EntityEventArgs e);
-
-    public delegate Task AfterSaveEventHandler(object sender, EntityEventArgs e);
-    public delegate Task AfterPersistEventHandler(object sender, EntityEventArgs e);
-    public delegate Task AfterDeleteEventHandler(object sender, EntityEventArgs e);
 
     public interface IRepository<TEntity, TKey>
         where TEntity : Entity
         where TKey : IComparable
     {
-        event BeforeSaveEventHandler BeforeSave;
-        event BeforePersistEventHandler BeforePersist;
-        event BeforeDeleteEventHandler BeforeDelete;
-
-        event AfterSaveEventHandler AfterSave;
-        event AfterPersistEventHandler AfterPersist;
-        event AfterDeleteEventHandler AfterDelete;
-
         DbContextTransaction BeginTransaction();
 
         Task<TEntity> Find(TKey id);

@@ -10,6 +10,15 @@ using System.Threading.Tasks;
 
 namespace Gorilla.DDD
 {
+
+    public delegate Task BeforeSaveEventHandler<T>(object sender, T e);
+    public delegate Task BeforePersistEventHandler<T>(object sender, T e);
+    public delegate Task BeforeDeleteEventHandler<T>(object sender, T e);
+
+    public delegate Task AfterSaveEventHandler<T>(object sender, T e);
+    public delegate Task AfterPersistEventHandler<T>(object sender, T e);
+    public delegate Task AfterDeleteEventHandler<T>(object sender, T e);
+
     public abstract class Repository<TContext, TEntity, TKey> : IRepository<TEntity, TKey>
         where TContext : DbContext, IContext
         where TEntity : Entity
@@ -17,13 +26,13 @@ namespace Gorilla.DDD
     {
         protected TContext _context;
 
-        public event BeforeSaveEventHandler BeforeSave;
-        public event BeforePersistEventHandler BeforePersist;
-        public event BeforeDeleteEventHandler BeforeDelete;
+        public event BeforeSaveEventHandler<TEntity> BeforeSave;
+        public event BeforePersistEventHandler<TEntity> BeforePersist;
+        public event BeforeDeleteEventHandler<TEntity> BeforeDelete;
 
-        public event AfterSaveEventHandler AfterSave;
-        public event AfterPersistEventHandler AfterPersist;
-        public event AfterDeleteEventHandler AfterDelete;
+        public event AfterSaveEventHandler<TEntity> AfterSave;
+        public event AfterPersistEventHandler<TEntity> AfterPersist;
+        public event AfterDeleteEventHandler<TEntity> AfterDelete;
 
         [Inject]
         public void InjectDependencies(TContext context)
@@ -212,50 +221,50 @@ namespace Gorilla.DDD
             return query;
         }
 
-        protected async Task OnBeforePersist(Entity entity)
+        protected async Task OnBeforePersist(TEntity entity)
         {
             if (BeforePersist != null)
             {
-                await BeforePersist(this, EntityEventArgs.Create(entity));
+                await BeforePersist(this, entity);
             }
         }
 
-        protected async Task OnBeforeSave(Entity entity)
+        protected async Task OnBeforeSave(TEntity entity)
         {
             if (BeforeSave != null)
             {
-                await BeforeSave(this, EntityEventArgs.Create(entity));
+                await BeforeSave(this, entity);
             }
         }
 
-        protected async Task OnBeforeDelete(Entity entity)
+        protected async Task OnBeforeDelete(TEntity entity)
         {
             if (BeforeDelete != null)
             {
-                await BeforeDelete(this, EntityEventArgs.Create(entity));
+                await BeforeDelete(this, entity);
             }
         }
 
-        protected async Task OnAfterPersist(Entity entity)
+        protected async Task OnAfterPersist(TEntity entity)
         {
             if (AfterPersist != null)
             {
-                await AfterPersist(this, EntityEventArgs.Create(entity));
+                await AfterPersist(this, entity);
             }
         }
 
-        protected async Task OnAfterSave(Entity entity)
+        protected async Task OnAfterSave(TEntity entity)
         {
             if (AfterSave != null)
             {
-                await AfterSave(this, EntityEventArgs.Create(entity));
+                await AfterSave(this, entity);
             }
         }
-        protected async Task OnAfterDelete(Entity entity)
+        protected async Task OnAfterDelete(TEntity entity)
         {
             if (AfterDelete != null)
             {
-                await AfterDelete(this, EntityEventArgs.Create(entity));
+                await AfterDelete(this, entity);
             }
         }
 

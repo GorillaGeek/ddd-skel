@@ -59,7 +59,6 @@
     <Compile Include="Entity.cs" />
     <Compile Include="Interfaces\IApplicationService.cs" />
     <Compile Include="Interfaces\IEntity.cs" />
-    <Compile Include="Events\EntityEventArgs.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Pagination\PagedResult.cs" />
     <Compile Include="Pagination\PaginationSettings.cs" />

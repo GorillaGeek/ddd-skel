@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionVisitor\ParameterRebinder.cs" />
     <Compile Include="Interfaces\IContext.cs" />
     <Compile Include="Extensions\LinkExtensions.cs" />
     <Compile Include="Entity.cs" />

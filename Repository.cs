@@ -163,40 +163,46 @@ namespace Gorilla.DDD
             return query.Select<TEntity, U>(columns);
         }
 
-        public virtual async Task<PagedResult<TResult>> SelectPagedBy<TResult>(PaginationSettings settings, Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns)
-        {
-            var query = _context.Set<TEntity>().AsQueryable();
-            query = AddFixedConditions(query);
-
-            var total = await query.CountAsync();
-
-            query = query.OrderBy<TEntity>(settings.OrderColumn, settings.OrderDirection.ToString());
-
-            var data = await query.Where(exp)
-                         .Select<TEntity, TResult>(columns)
-                         .Skip(settings.Skip)
-                         .Take(settings.Take)
-                         .ToListAsync();
-
-            return new PagedResult<TResult>(settings.Page, total, settings.Page, data);
-        }
-
         public virtual async Task<PagedResult<TEntity>> SelectPagedBy(PaginationSettings settings, Expression<Func<TEntity, bool>> exp)
         {
             var query = _context.Set<TEntity>().AsQueryable();
             query = AddFixedConditions(query);
 
+            if (exp != null)
+            {
+                query = query.Where(exp);
+            }
+
+
             var total = await query.CountAsync();
-
-            query = query.OrderBy<TEntity>(settings.OrderColumn, settings.OrderDirection.ToString());
-
-            var data = await query.Where(exp)
+            var data = await query.OrderBy<TEntity>(settings.OrderColumn, settings.OrderDirection.ToString())
                          .Skip(settings.Skip)
                          .Take(settings.Take)
                          .ToListAsync();
 
             return new PagedResult<TEntity>(settings.Page, total, settings.Page, data);
         }
+
+        public virtual async Task<PagedResult<TResult>> SelectPagedBy<TResult>(PaginationSettings settings, Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+            query = AddFixedConditions(query);
+
+            if (exp != null)
+            {
+                query = query.Where(exp);
+            }
+
+            var total = await query.CountAsync();
+            var data = await query.OrderBy<TEntity>(settings.OrderColumn, settings.OrderDirection.ToString())
+                            .Select<TEntity, TResult>(columns)
+                            .Skip(settings.Skip)
+                            .Take(settings.Take)
+                            .ToListAsync();
+
+            return new PagedResult<TResult>(settings.Page, total, settings.Page, data);
+        }
+
 
         public virtual async Task<PagedResult<TResult>> SelectPaged<TResult>(PaginationSettings settings, Expression<Func<TEntity, TResult>> columns)
         {

@@ -180,7 +180,7 @@ namespace Gorilla.DDD
                          .Take(settings.Take)
                          .ToListAsync();
 
-            return new PagedResult<TEntity>(settings.Page, total, settings.Page, data);
+            return new PagedResult<TEntity>(settings.Page, total, settings.Take, data);
         }
 
         public virtual async Task<PagedResult<TResult>> SelectPagedBy<TResult>(PaginationSettings settings, Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns)
@@ -200,7 +200,7 @@ namespace Gorilla.DDD
                             .Take(settings.Take)
                             .ToListAsync();
 
-            return new PagedResult<TResult>(settings.Page, total, settings.Page, data);
+            return new PagedResult<TResult>(settings.Page, total, settings.Take, data);
         }
 
 
@@ -219,7 +219,7 @@ namespace Gorilla.DDD
                          .Take(settings.Take)
                          .ToListAsync();
 
-            return new PagedResult<TResult>(settings.Page, total, settings.Page, data);
+            return new PagedResult<TResult>(settings.Page, total, settings.Take, data);
         }
 
         protected virtual IQueryable<TEntity> AddFixedConditions(IQueryable<TEntity> query)

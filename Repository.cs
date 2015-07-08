@@ -149,11 +149,17 @@ namespace Gorilla.DDD
                         .Select<TEntity, TResult>(columns);
         }
 
-        public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> exp)
+        public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> exp = null)
         {
             var query = _context.Set<TEntity>().AsQueryable();
             query = AddFixedConditions(query);
-            return query.Where(exp);
+
+            if (exp != null)
+            {
+                query = query.Where(exp);
+            }
+
+            return query;
         }
 
         public virtual IQueryable<U> Query<U>(Expression<Func<TEntity, U>> columns)

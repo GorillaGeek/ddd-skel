@@ -24,11 +24,6 @@ namespace Gorilla.DDD
             _context = context;
         }
 
-        //public DbContextTransaction BeginTransaction()
-        //{
-        //    return _context.Database.BeginTransaction();
-        //}
-
         public virtual async Task<TEntity> Find(TKey id)
         {
             return await _context.Set<TEntity>().FindAsync(id);

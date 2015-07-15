@@ -11,14 +11,6 @@ using System.Threading.Tasks;
 namespace Gorilla.DDD
 {
 
-    public delegate Task BeforeSaveEventHandler<T>(object sender, T e);
-    public delegate Task BeforePersistEventHandler<T>(object sender, T e);
-    public delegate Task BeforeDeleteEventHandler<T>(object sender, T e);
-
-    public delegate Task AfterSaveEventHandler<T>(object sender, T e);
-    public delegate Task AfterPersistEventHandler<T>(object sender, T e);
-    public delegate Task AfterDeleteEventHandler<T>(object sender, T e);
-
     public abstract class Repository<TContext, TEntity, TKey> : IRepository<TEntity, TKey>
         where TContext : DbContext, IContext
         where TEntity : Entity
@@ -26,24 +18,16 @@ namespace Gorilla.DDD
     {
         protected TContext _context;
 
-        public event BeforeSaveEventHandler<TEntity> BeforeSave;
-        public event BeforePersistEventHandler<TEntity> BeforePersist;
-        public event BeforeDeleteEventHandler<TEntity> BeforeDelete;
-
-        public event AfterSaveEventHandler<TEntity> AfterSave;
-        public event AfterPersistEventHandler<TEntity> AfterPersist;
-        public event AfterDeleteEventHandler<TEntity> AfterDelete;
-
         [Inject]
         public void InjectDependencies(TContext context)
         {
             _context = context;
         }
 
-        public DbContextTransaction BeginTransaction()
-        {
-            return _context.Database.BeginTransaction();
-        }
+        //public DbContextTransaction BeginTransaction()
+        //{
+        //    return _context.Database.BeginTransaction();
+        //}
 
         public virtual async Task<TEntity> Find(TKey id)
         {
@@ -57,29 +41,18 @@ namespace Gorilla.DDD
 
         public virtual async Task<TEntity> Add(TEntity entity)
         {
-
-            await OnBeforePersist(entity);
-            await OnBeforeSave(entity);
-
             _context.Set<TEntity>().Add(entity);
             await _context.SaveChangesAsync();
-
-            await OnAfterPersist(entity);
-            await OnAfterSave(entity);
 
             return entity;
         }
 
         public virtual async Task<TEntity> Update(TEntity entity)
         {
-            await OnBeforeSave(entity);
-
             try
             {
                 _context.EnableAutoDetectChanges();
                 await _context.SaveChangesAsync();
-
-                await OnAfterSave(entity);
             }
             finally
             {
@@ -103,12 +76,8 @@ namespace Gorilla.DDD
 
         public virtual async Task<bool> Remove(TEntity entity)
         {
-            await OnBeforeDelete(entity);
-
             _context.Set<TEntity>().Remove(entity);
             await _context.SaveChangesAsync();
-
-            await OnAfterDelete(entity);
 
             return true;
         }
@@ -232,53 +201,5 @@ namespace Gorilla.DDD
         {
             return query;
         }
-
-        protected async Task OnBeforePersist(TEntity entity)
-        {
-            if (BeforePersist != null)
-            {
-                await BeforePersist(this, entity);
-            }
-        }
-
-        protected async Task OnBeforeSave(TEntity entity)
-        {
-            if (BeforeSave != null)
-            {
-                await BeforeSave(this, entity);
-            }
-        }
-
-        protected async Task OnBeforeDelete(TEntity entity)
-        {
-            if (BeforeDelete != null)
-            {
-                await BeforeDelete(this, entity);
-            }
-        }
-
-        protected async Task OnAfterPersist(TEntity entity)
-        {
-            if (AfterPersist != null)
-            {
-                await AfterPersist(this, entity);
-            }
-        }
-
-        protected async Task OnAfterSave(TEntity entity)
-        {
-            if (AfterSave != null)
-            {
-                await AfterSave(this, entity);
-            }
-        }
-        protected async Task OnAfterDelete(TEntity entity)
-        {
-            if (AfterDelete != null)
-            {
-                await AfterDelete(this, entity);
-            }
-        }
-
     }
 }

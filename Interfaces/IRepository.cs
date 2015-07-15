@@ -2,7 +2,6 @@
 using Gorilla.DDD.Pagination;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace Gorilla.DDD
         where TEntity : Entity
         where TKey : IComparable
     {
-        DbContextTransaction BeginTransaction();
+        //DbContextTransaction BeginTransaction();
 
         Task<TEntity> Find(TKey id);
 

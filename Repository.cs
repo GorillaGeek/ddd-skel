@@ -31,7 +31,9 @@ namespace Gorilla.DDD
 
         public virtual async Task<List<TEntity>> All()
         {
-            return await _context.Set<TEntity>().ToListAsync();
+            return await _context.Set<TEntity>()
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public virtual async Task<TEntity> Add(TEntity entity)

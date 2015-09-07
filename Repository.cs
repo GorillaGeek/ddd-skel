@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Gorilla.DDD.Interfaces;
 
 namespace Gorilla.DDD
 {
@@ -197,6 +198,39 @@ namespace Gorilla.DDD
         protected virtual IQueryable<TEntity> AddFixedConditions(IQueryable<TEntity> query)
         {
             return query;
+        }
+
+        protected virtual IQueryable<TEntity> FindByIdQuery(IQueryable<TEntity> query, TKey id)
+        {
+            throw  new NotImplementedException();
+        }
+
+        public virtual async Task<TEntity> FindWithInclude(TKey id, params Expression<Func<TEntity, object>>[] includeSelector)
+        {
+            var query = FindByIdQuery(_context.Set<TEntity>(), id);
+
+            query = includeSelector.Aggregate(query, IncludeInternal);
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        protected virtual IQueryable<TEntity> FindWithInclude(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includeSelector)
+        {
+            return includeSelector.Aggregate(query, IncludeInternal);
+        }
+
+        private IQueryable<T> IncludeInternal<T>(IQueryable<T> query, Expression<Func<TEntity, object>> selector)
+        {
+            string propertyName = GetPropertyName(selector);
+            return query.Include(propertyName);
+        }
+
+        private string GetPropertyName<T>(Expression<Func<T, object>> expression)
+        {
+            MemberExpression memberExpr = expression.Body as MemberExpression;
+            if (memberExpr == null)
+                throw new ArgumentException("Expression body must be a member expression");
+            return memberExpr.Member.Name;
         }
     }
 }

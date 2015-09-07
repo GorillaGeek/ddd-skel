@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Gorilla.DDD.Interfaces;
 
 namespace Gorilla.DDD
 {
@@ -45,5 +46,6 @@ namespace Gorilla.DDD
 
         IQueryable<TResult> QueryBy<TResult>(Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns);
 
+        Task<TEntity> FindWithInclude(TKey id, params Expression<Func<TEntity, object>>[] includeSelector);
     }
 }

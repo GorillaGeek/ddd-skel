@@ -2,10 +2,13 @@
 using Gorilla.DDD.Pagination;
 using Ninject;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using Gorilla.DDD.Interfaces;
 
@@ -33,6 +36,13 @@ namespace Gorilla.DDD
         public virtual async Task<List<TEntity>> All()
         {
             return await _context.Set<TEntity>()
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<TEntity>> AllWithInclude(params Expression<Func<TEntity, object>>[] includeSelector)
+        {
+            return await includeSelector.Aggregate(_context.Set<TEntity>().AsQueryable(), IncludeInternal)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -202,7 +212,7 @@ namespace Gorilla.DDD
 
         protected virtual IQueryable<TEntity> FindByIdQuery(IQueryable<TEntity> query, TKey id)
         {
-            throw  new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public virtual async Task<TEntity> FindWithInclude(TKey id, params Expression<Func<TEntity, object>>[] includeSelector)
@@ -221,7 +231,7 @@ namespace Gorilla.DDD
 
         private IQueryable<T> IncludeInternal<T>(IQueryable<T> query, Expression<Func<TEntity, object>> selector)
         {
-            string propertyName = GetPropertyName(selector);
+            string propertyName = FuncToString(selector);
             return query.Include(propertyName);
         }
 
@@ -231,6 +241,26 @@ namespace Gorilla.DDD
             if (memberExpr == null)
                 throw new ArgumentException("Expression body must be a member expression");
             return memberExpr.Member.Name;
+        }
+
+        private static string FuncToString(Expression selector)
+        {
+            switch (selector.NodeType)
+            {
+                case ExpressionType.Lambda:
+                    var lambdaBody = ((LambdaExpression)selector).Body;
+                    if (lambdaBody.NodeType == ExpressionType.Call) return FuncToString(lambdaBody);
+
+                    return (lambdaBody as MemberExpression).Member.Name;
+                case ExpressionType.MemberAccess:
+                    return ((selector as MemberExpression).Member as System.Reflection.PropertyInfo).Name;
+                case ExpressionType.Call:
+                    var method = selector as MethodCallExpression;
+                    return FuncToString(method.Arguments[0]) + "." + FuncToString(method.Arguments[1]);
+                case ExpressionType.Quote:
+                    return FuncToString(((selector as UnaryExpression).Operand as LambdaExpression).Body);
+            }
+            throw new InvalidOperationException();
         }
     }
 }

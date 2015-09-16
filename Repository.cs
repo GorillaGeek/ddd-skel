@@ -2,15 +2,11 @@
 using Gorilla.DDD.Pagination;
 using Ninject;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using Gorilla.DDD.Interfaces;
 
 namespace Gorilla.DDD
 {
@@ -21,6 +17,12 @@ namespace Gorilla.DDD
         where TKey : IComparable
     {
         protected TContext _context;
+
+#if DEBUG
+        private DateTime _createDateTime = DateTime.Now;
+
+        public DateTime CreatedDateTime => _createDateTime;
+#endif
 
         [Inject]
         public void InjectDependencies(TContext context)

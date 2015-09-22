@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Gorilla.DDD
@@ -250,10 +251,13 @@ namespace Gorilla.DDD
             switch (selector.NodeType)
             {
                 case ExpressionType.Lambda:
-                    var lambdaBody = ((LambdaExpression)selector).Body;
-                    if (lambdaBody.NodeType == ExpressionType.Call) return FuncToString(lambdaBody);
 
-                    return (lambdaBody as MemberExpression).Member.Name;
+                    var lambdaBody = ((LambdaExpression)selector).Body;
+
+                    return lambdaBody.NodeType == ExpressionType.Call
+                        ? FuncToString(lambdaBody)              // That`s meant for expressions like "x=> x.Terms.Select(q=> q.Logo) > Terms.Logo"
+                        : ExtractFuncFromString(lambdaBody);    // That`s meant for expressions like "x=> x.Template.Logo"
+
                 case ExpressionType.MemberAccess:
                     return ((selector as MemberExpression).Member as System.Reflection.PropertyInfo).Name;
                 case ExpressionType.Call:
@@ -263,6 +267,12 @@ namespace Gorilla.DDD
                     return FuncToString(((selector as UnaryExpression).Operand as LambdaExpression).Body);
             }
             throw new InvalidOperationException();
+        }
+
+        private static string ExtractFuncFromString(Expression lambdaBody)
+        {
+            var match = new Regex(@"[^.]\.(?<include>\S+)").Match(lambdaBody.ToString());
+            return match.Groups["include"].Value.TrimEnd();
         }
     }
 }

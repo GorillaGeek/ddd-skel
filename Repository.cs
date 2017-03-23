@@ -132,6 +132,7 @@ namespace Gorilla.DDD
         public virtual IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> exp = null)
         {
             var query = _context.Set<TEntity>().AsQueryable();
+
             query = AddFixedConditions(query);
 
             if (exp != null)
@@ -172,6 +173,7 @@ namespace Gorilla.DDD
         public virtual async Task<PagedResult<TResult>> SelectPagedBy<TResult>(PaginationSettings settings, Expression<Func<TEntity, bool>> exp, Expression<Func<TEntity, TResult>> columns)
         {
             var query = _context.Set<TEntity>().AsQueryable();
+
             query = AddFixedConditions(query);
 
             if (exp != null)
@@ -273,6 +275,11 @@ namespace Gorilla.DDD
         {
             var match = new Regex(@"[^.]\.(?<include>\S+)").Match(lambdaBody.ToString());
             return match.Groups["include"].Value.TrimEnd();
+        }
+
+        public void Attach(object entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }

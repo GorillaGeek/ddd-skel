@@ -16,13 +16,15 @@ namespace Gorilla.DDD
     {
         //DbContextTransaction BeginTransaction();
 
+        void Attach(object entity);
+
         Task<TEntity> Find(TKey id);
 
-        Task<List<TEntity>> All();
+        Task<List<TEntity>> All();        
 
         Task<List<TEntity>> AllWithInclude(params Expression<Func<TEntity, object>>[] includeSelector);
 
-        Task<TEntity> Add(TEntity entity);
+         Task<TEntity> Add(TEntity entity);
 
         Task<TEntity> Update(TEntity entity);
 
